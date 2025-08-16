@@ -15,6 +15,9 @@ Git and GitHub
 
 Untrakced  files are in file system  as per vsc   Red
 Staged  files 
+
+
+qqq
 Tracked  file are in vsc
 How to push code from local to github
 git init
@@ -28,3 +31,4 @@ git add .
 git commit -m "anything”
 git push
 git set untracked
+
