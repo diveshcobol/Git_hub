@@ -1,0 +1,32 @@
+import re
+from pylint.checkers import BaseChecker
+from pylint.interfaces import IAstroidChecker
+
+class DateFormatChecker(BaseChecker):
+    __implements__ = IAstroidChecker
+
+    name = "date-format-checker"
+    msgs = {
+        "W9003": (
+            "Date string '%s' looks like ddmmyyyy, should be yyyymmdd",
+            "invalid-date-format",
+            "Use date format yyyymmdd instead of ddmmyyyy.",
+        ),
+    }
+
+    def visit_const(self, node):
+        """
+        Called on every constant (like string literals).
+        """
+        if isinstance(node.value, str):
+            val = node.value
+            # Check if it looks like ddmmyyyy (8 digits, day<=31, month<=12, year starts with 19/20)
+            if re.fullmatch(r"\d{8}", val):
+                day, month, year = int(val[0:2]), int(val[2:4]), int(val[4:8])
+                if 1 <= day <= 31 and 1 <= month <= 12 and year >= 1900:
+                    # Warn → looks like ddmmyyyy, not yyyymmdd
+                    self.add_message("invalid-date-format", node=node, args=(val,))
+
+
+def register(linter):
+    linter.register_checker(DateFormatChecker(linter))
