@@ -1,0 +1,42 @@
+from pylint.checkers import BaseChecker
+from pylint.interfaces import IAstroidChecker
+
+SENSITIVE_KEYWORDS = ["password", "passwd", "token", "tocken", "secret", "apikey"]
+
+class SensitiveNameChecker(BaseChecker):
+    __implements__ = IAstroidChecker
+
+    name = "sensitive-name-checker"
+    priority = -1
+    msgs = {
+        "W9001": (
+            "Sensitive name '%s' found in code",
+            "sensitive-name",
+            "Using sensitive names like password/token in code may expose secrets.",
+        ),
+    }
+
+    def visit_assign(self, node):
+        # check variable assignments
+        for target in node.targets:
+            if hasattr(target, "name"):
+                self._check_name(target.name, node)
+
+    def visit_functiondef(self, node):
+        # check function names
+        self._check_name(node.name, node)
+
+    def visit_classdef(self, node):
+        # check class names
+        self._check_name(node.name, node)
+
+    def _check_name(self, name, node):
+        lname = name.lower()
+        for word in SENSITIVE_KEYWORDS:
+            if word in lname:
+                self.add_message("sensitive-name", node=node, args=(name,))
+                break
+
+
+def register(linter):
+    linter.register_checker(SensitiveNameChecker(linter))
