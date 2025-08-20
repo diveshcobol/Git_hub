@@ -1,28 +1,18 @@
-import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
-def is_valid_ddmmyyyy(date_str: str) -> bool:
+def january_dates_ddmmyyyy(year: int):
     """
-    Check if the given string matches ddmmyyyy format and is a valid date.
+    Print all dates in January of the given year in ddmmyyyy format.
     """
-    # Must be exactly 8 digits
-    if not re.fullmatch(r"\d{8}", date_str):
-        return False
-    
-    # Extract day, month, year
-    day = int(date_str[0:2])
-    month = int(date_str[2:4])
-    year = int(date_str[4:8])
+    start_date = datetime(year, 1, 1)   # 1st Jan
+    end_date = datetime(year, 2, 1)     # 1st Feb (stop before this)
 
-    try:
-        datetime(year, month, day)  # Validate actual date
-        return True
-    except ValueError:
-        return False
+    current = start_date
+    while current < end_date:
+        print(current.strftime("%d%m%Y"))  # ddmmyyyy
+        current += timedelta(days=1)
 
 
-# 🔹 Example tests
-test_dates = ["01012025", "31122024", "31022025", "abcd2025"]
+# 🔹 Example: Show Jan 2025
+january_dates_ddmmyyyy(2025)
 
-for d in test_dates:
-    print(f"{d}: {is_valid_ddmmyyyy(d)}")
